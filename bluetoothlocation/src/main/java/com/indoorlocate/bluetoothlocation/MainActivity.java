@@ -12,6 +12,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -38,7 +40,6 @@ public class MainActivity extends Activity {
     List<String> lst_Devices = new ArrayList<>();
     BluetoothGatt mBluetoothGatt1;
     BluetoothGatt mBluetoothGatt2;
-    RssiThread rssiThread;
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
