@@ -25,6 +25,68 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends Activity {
+    public class RssiThread extends Thread {
+        //public static Handler rssiHandler;
+        BluetoothGatt mbluetootGatt;
+        BluetoothDevice device;
+        String address;
+        RssiThread(String str){
+            this.address =str;
+        }
+        @Override
+        public void run() {
+           /* Looper.prepare();
+            Log.v("MainActivity", "获取rssi的线程已经启用");
+            Log.v("MainActivity",mbluetootGatt.toString());
+            rssiHandler=new Handler(){
+               @Override
+               public void handleMessage(Message msg) {
+                  if(msg.what==0x123){
+                      Log.v("MainActivity",msg.getData().getString("inf"));
+                  }
+               }
+           };
+        Looper.loop();*/
+            device= BluetoothAdapter.getDefaultAdapter().getRemoteDevice(address);
+            mbluetootGatt=device.connectGatt(MainActivity.this,false,gattCallback);
+            Log.v("MainActivity","读取一次"+mbluetootGatt.toString()+"的RSSI");
+            while(true){
+                mbluetootGatt.readRemoteRssi();
+                try {
+                    Thread.currentThread().sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        //实现gattCallback
+        private final BluetoothGattCallback gattCallback = new BluetoothGattCallback()
+        {
+            @Override
+            public void onConnectionStateChange(BluetoothGatt mBluetoothGatt, int status, int newState)
+            {
+                //设备连接状态改变会回调这个函数
+                // Log.v(TAG, "回调函数已经调用");
+                super.onConnectionStateChange(mBluetoothGatt, status, newState);
+                if (newState == BluetoothProfile.STATE_CONNECTED)
+                {
+                    //连接成功, 可以把这个gatt 保存起来, 需要读rssi的时候就
+                    Log.v("MainActivity", "回调函数已经调用");
+                }
+            }
+            @Override
+            //底层获取RSSI后会回调这个函数
+            public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
+                super.onReadRemoteRssi(gatt, rssi, status);
+                //判断是否读取成功
+                // if(rssi!=0)
+                // {
+                Log.v("MainActivity",""+rssi);
+                // }
+            }
+        };
+    }
+
     //声明变量
     private static final String TAG = MainActivity.class.getSimpleName();
     BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -179,52 +241,20 @@ public class MainActivity extends Activity {
             String str = lst_Devices.get(arg2);
             String[] values = str.split("\\|");
             String address = values[2];
-            BluetoothDevice btDev = bluetoothAdapter.getRemoteDevice(address);
             switch (arg2){
                 case 0:
-                    mBluetoothGatt1 = btDev.connectGatt(MainActivity.this, false, gattCallback);
-                    rssiThread=new RssiThread(mBluetoothGatt1);
+                    rssiThread=new RssiThread(address);
                     rssiThread.start();
                 break;
                 case 1:
-                    mBluetoothGatt2 = btDev.connectGatt(MainActivity.this, false, gattCallback);
-                    rssiThread2=new RssiThread(mBluetoothGatt2);
+                    rssiThread2=new RssiThread(address);
                     rssiThread2.start();
                     break;
                 case 2:
-                    mBluetoothGatt3 = btDev.connectGatt(MainActivity.this, false, gattCallback);
-                    rssiThread3=new RssiThread(mBluetoothGatt3);
+                    rssiThread3=new RssiThread(address);
                     rssiThread3.start();
                     default:break;
             }
         }
     }
-
-    //实现gattCallback
-    private final BluetoothGattCallback gattCallback = new BluetoothGattCallback()
-    {
-        @Override
-        public void onConnectionStateChange(BluetoothGatt mBluetoothGatt, int status, int newState)
-        {
-            //设备连接状态改变会回调这个函数
-           // Log.v(TAG, "回调函数已经调用");
-            super.onConnectionStateChange(mBluetoothGatt, status, newState);
-            if (newState == BluetoothProfile.STATE_CONNECTED)
-            {
-                //连接成功, 可以把这个gatt 保存起来, 需要读rssi的时候就
-                Log.v(TAG, "回调函数已经调用");
-            }
-        }
-        @Override
-        //底层获取RSSI后会回调这个函数
-        public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
-            super.onReadRemoteRssi(gatt, rssi, status);
-            //判断是否读取成功
-           // if(rssi!=0)
-           // {
-            Log.v(TAG,""+rssi);
-           // }
-        }
-
-    };
 }
