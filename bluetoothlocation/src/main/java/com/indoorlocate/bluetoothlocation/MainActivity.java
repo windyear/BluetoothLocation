@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -24,12 +25,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends Activity {
+    //声明变量
     private static final String TAG = MainActivity.class.getSimpleName();
     BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     Button bt1;
     Button btrssi1;
     Button btrssi2;
-    TextView RSSI;
+    Button Btrssi3;
     ProgressBar progressBar;
     ListView b_listView;
     ArrayAdapter<String> adt_Devices;
@@ -39,6 +41,7 @@ public class MainActivity extends Activity {
     BluetoothGatt mBluetoothGatt1;
     BluetoothGatt mBluetoothGatt2;
     RssiThread rssiThread;
+    //广播接收器
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -74,6 +77,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //利用Intent请求获得蓝牙权限
         if (!bluetoothAdapter.isEnabled()) {
             int REQUEST_ENABLE_BT = 1;
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -82,9 +86,10 @@ public class MainActivity extends Activity {
             Toast toast = Toast.makeText(MainActivity.this, "已经打开了蓝牙，可以正常使用APP", Toast.LENGTH_LONG);
             toast.show();
         }
+        //找到对象对应控件
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         bt1 = (Button) findViewById(R.id.button);
-        RSSI=(TextView)findViewById(R.id.Rssi);
+        Btrssi3= (Button) findViewById(R.id.RssiThread);
         btrssi1=(Button)findViewById(R.id.RSSIbutton1);
         btrssi2=(Button)findViewById(R.id.RSSIbutton2);
         b_listView = (ListView) this.findViewById(R.id.lvDevices);
@@ -100,6 +105,7 @@ public class MainActivity extends Activity {
         intent.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(mReceiver, intent);
         num=new int[3000];
+        //添加两个按钮的单击事件
         btrssi1.setOnClickListener(new Button.OnClickListener() {
 
             @Override
@@ -117,7 +123,6 @@ public class MainActivity extends Activity {
                 for(mark=0;mark<3000;mark++){
                     Log.v(TAG,""+num[mark]+" "+mark);
                 }
-                RSSI.setText(""+mark);
                 Toast.makeText(MainActivity.this,"读取完毕",Toast.LENGTH_SHORT).show();
             }
         });
@@ -138,11 +143,25 @@ public class MainActivity extends Activity {
                 for(mark=0;mark<3000;mark++){
                     Log.v(TAG,""+num[mark]+" "+mark);
                 }
-                RSSI.setText(""+mark);
                 Toast.makeText(MainActivity.this,"读取完毕",Toast.LENGTH_SHORT).show();
             }
         });
+        //该单击时间创建了新的线程并且启动了，发送了一个消息给新线程
+        Btrssi3.setOnClickListener(new Button.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Log.v(TAG, "点击了发送消息");
+                Message msg=new Message();
+                msg.what=0x123;
+                Bundle bundle=new Bundle();
+                bundle.putString("inf","主线程发送过来的消息");
+                msg.setData(bundle);
+                rssiThread.rssiHandler.sendMessage(msg);
+            }
+        });
     }
+    //检查蓝牙是否打开
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             Toast toast = Toast.makeText(MainActivity.this, "已经打开了蓝牙，可以正常使用APP", Toast.LENGTH_LONG);
@@ -187,14 +206,14 @@ public class MainActivity extends Activity {
             if(arg2==0){
             mBluetoothGatt1 = btDev.connectGatt(MainActivity.this, false, gattCallback);}
             else { mBluetoothGatt2 = btDev.connectGatt(MainActivity.this, false, gattCallback);}
-
+            rssiThread=new RssiThread(mBluetoothGatt1);
+            rssiThread.start();
         }
     }
 
     //实现gattCallback
     private final BluetoothGattCallback gattCallback = new BluetoothGattCallback()
     {
-
         @Override
         public void onConnectionStateChange(BluetoothGatt mBluetoothGatt, int status, int newState)
         {
@@ -208,8 +227,6 @@ public class MainActivity extends Activity {
                 Log.v(TAG, "回调函数已经调用");
             }
         }
-
-
         @Override
         //底层获取RSSI后会回调这个函数
         public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
