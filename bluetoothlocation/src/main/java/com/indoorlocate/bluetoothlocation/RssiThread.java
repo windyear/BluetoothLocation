@@ -10,14 +10,14 @@ import android.util.Log;
  * Created by Xuwen on 2016/4/3.
  */
 public class RssiThread extends Thread {
-    public static Handler rssiHandler;
+    //public static Handler rssiHandler;
      BluetoothGatt mbluetootGatt;
      RssiThread(BluetoothGatt bluetoothGatt){
        this.mbluetootGatt=bluetoothGatt;
     }
     @Override
     public void run() {
-            Looper.prepare();
+           /* Looper.prepare();
             Log.v("MainActivity", "获取rssi的线程已经启用");
             Log.v("MainActivity",mbluetootGatt.toString());
             rssiHandler=new Handler(){
@@ -28,6 +28,15 @@ public class RssiThread extends Thread {
                   }
                }
            };
-        Looper.loop();
+        Looper.loop();*/
+        while(true){
+            Log.v("MainActivity","读取一次"+mbluetootGatt.toString()+"的RSSI");
+            mbluetootGatt.readRemoteRssi();
+            try {
+                Thread.currentThread().sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         }
     }

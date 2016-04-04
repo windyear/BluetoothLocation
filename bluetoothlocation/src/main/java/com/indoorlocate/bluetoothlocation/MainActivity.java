@@ -36,11 +36,13 @@ public class MainActivity extends Activity {
     ListView b_listView;
     ArrayAdapter<String> adt_Devices;
     int mark;
-    int num[];
     List<String> lst_Devices = new ArrayList<>();
     BluetoothGatt mBluetoothGatt1;
     BluetoothGatt mBluetoothGatt2;
+    BluetoothGatt mBluetoothGatt3;
     RssiThread rssiThread;
+    RssiThread rssiThread2;
+    RssiThread rssiThread3;
     //广播接收器
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -104,46 +106,21 @@ public class MainActivity extends Activity {
         intent.addAction(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
         intent.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(mReceiver, intent);
-        num=new int[3000];
         //添加两个按钮的单击事件
         btrssi1.setOnClickListener(new Button.OnClickListener() {
 
             @Override
             public void onClick(View v) {
                 Log.v(TAG, "点击了读取");
-                for(mark=0;mark<3000;) {
-                    mBluetoothGatt1.readRemoteRssi();
-                   /* try {
-                        Thread.currentThread().sleep(10);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }*/
-                    //Log.v(TAG,"线程已经暂停一秒");
+                mBluetoothGatt1.readRemoteRssi();
                 }
-                for(mark=0;mark<3000;mark++){
-                    Log.v(TAG,""+num[mark]+" "+mark);
-                }
-                Toast.makeText(MainActivity.this,"读取完毕",Toast.LENGTH_SHORT).show();
-            }
         });
         btrssi2.setOnClickListener(new Button.OnClickListener() {
 
             @Override
             public void onClick(View v) {
                 Log.v(TAG, "点击了读取");
-                for(mark=0;mark<3000;) {
-                    mBluetoothGatt2.readRemoteRssi();
-                   /* try {
-                        Thread.currentThread().sleep(10);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }*/
-                    //Log.v(TAG,"线程已经暂停一秒");
-                }
-                for(mark=0;mark<3000;mark++){
-                    Log.v(TAG,""+num[mark]+" "+mark);
-                }
-                Toast.makeText(MainActivity.this,"读取完毕",Toast.LENGTH_SHORT).show();
+                mBluetoothGatt2.readRemoteRssi();
             }
         });
         //该单击时间创建了新的线程并且启动了，发送了一个消息给新线程
@@ -152,12 +129,12 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Log.v(TAG, "点击了发送消息");
-                Message msg=new Message();
+               /* Message msg=new Message();
                 msg.what=0x123;
                 Bundle bundle=new Bundle();
                 bundle.putString("inf","主线程发送过来的消息");
                 msg.setData(bundle);
-                rssiThread.rssiHandler.sendMessage(msg);
+                rssiThread.rssiHandler.sendMessage(msg);*/
             }
         });
     }
@@ -203,11 +180,23 @@ public class MainActivity extends Activity {
             String[] values = str.split("\\|");
             String address = values[2];
             BluetoothDevice btDev = bluetoothAdapter.getRemoteDevice(address);
-            if(arg2==0){
-            mBluetoothGatt1 = btDev.connectGatt(MainActivity.this, false, gattCallback);}
-            else { mBluetoothGatt2 = btDev.connectGatt(MainActivity.this, false, gattCallback);}
-            rssiThread=new RssiThread(mBluetoothGatt1);
-            rssiThread.start();
+            switch (arg2){
+                case 0:
+                    mBluetoothGatt1 = btDev.connectGatt(MainActivity.this, false, gattCallback);
+                    rssiThread=new RssiThread(mBluetoothGatt1);
+                    rssiThread.start();
+                break;
+                case 1:
+                    mBluetoothGatt2 = btDev.connectGatt(MainActivity.this, false, gattCallback);
+                    rssiThread2=new RssiThread(mBluetoothGatt2);
+                    rssiThread2.start();
+                    break;
+                case 2:
+                    mBluetoothGatt3 = btDev.connectGatt(MainActivity.this, false, gattCallback);
+                    rssiThread3=new RssiThread(mBluetoothGatt3);
+                    rssiThread3.start();
+                    default:break;
+            }
         }
     }
 
@@ -218,12 +207,11 @@ public class MainActivity extends Activity {
         public void onConnectionStateChange(BluetoothGatt mBluetoothGatt, int status, int newState)
         {
             //设备连接状态改变会回调这个函数
-            Log.v(TAG, "回调函数已经调用");
+           // Log.v(TAG, "回调函数已经调用");
             super.onConnectionStateChange(mBluetoothGatt, status, newState);
             if (newState == BluetoothProfile.STATE_CONNECTED)
             {
                 //连接成功, 可以把这个gatt 保存起来, 需要读rssi的时候就
-               Toast.makeText(MainActivity.this, "已经连接", Toast.LENGTH_LONG).show();
                 Log.v(TAG, "回调函数已经调用");
             }
         }
@@ -232,11 +220,10 @@ public class MainActivity extends Activity {
         public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
             super.onReadRemoteRssi(gatt, rssi, status);
             //判断是否读取成功
-            if(rssi!=0)
-            {
-                num[mark]=rssi;
-                mark++;
-            }
+           // if(rssi!=0)
+           // {
+            Log.v(TAG,""+rssi);
+           // }
         }
 
     };
