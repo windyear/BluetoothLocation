@@ -1,5 +1,4 @@
 package com.indoorlocate.bluetoothlocation;
-
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -11,15 +10,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.Message;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,14 +46,17 @@ public class MainActivity extends Activity {
             device= BluetoothAdapter.getDefaultAdapter().getRemoteDevice(address);
             mbluetootGatt=device.connectGatt(MainActivity.this,false,gattCallback);
             Log.v("MainActivity","读取一次"+mbluetootGatt.toString()+"的RSSI");
-            while(true){
+           // while(true){
+            for(int i=0;i<30;i++){
                 mbluetootGatt.readRemoteRssi();
                 try {
-                    Thread.currentThread().sleep(2000);
+                    Thread.currentThread().sleep(500);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
+            mbluetootGatt=null;
+            System.gc();
         }
         //实现gattCallback
         private final BluetoothGattCallback gattCallback = new BluetoothGattCallback()
@@ -81,7 +80,10 @@ public class MainActivity extends Activity {
                 //判断是否读取成功
                 // if(rssi!=0)
                 // {
-                Log.v("MainActivity",""+rssi);
+                if(address==str1){
+                Log.v("MainActivity"+gatt.toString(),""+(rssi+200));}
+                else if(address==str2){ Log.v("MainActivity"+gatt.toString(),""+(rssi-400));}
+                else  Log.v("MainActivity"+gatt.toString(),""+(rssi-200));
                 // }
             }
         };
@@ -105,6 +107,7 @@ public class MainActivity extends Activity {
     RssiThread rssiThread;
     RssiThread rssiThread2;
     RssiThread rssiThread3;
+    String str1,str2,str3;
     //广播接收器
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -160,7 +163,11 @@ public class MainActivity extends Activity {
         adt_Devices = new ArrayAdapter<>(this,
                 android.R.layout.simple_list_item_1, lst_Devices);
         b_listView.setAdapter(adt_Devices);
-        b_listView.setOnItemClickListener(new ItemClickEvent());
+        str1="78:A5:04:7A:54:FA";
+        str2="20:91:48:32:26:60";
+        str3="20:91:48:32:21:45";
+
+        //b_listView.setOnItemClickListener(new ItemClickEvent());
         // 注册Receiver来获取蓝牙设备相关的结果
         IntentFilter intent = new IntentFilter();
         intent.addAction(BluetoothDevice.ACTION_FOUND);// 用BroadcastReceiver来取得搜索结果
@@ -190,13 +197,20 @@ public class MainActivity extends Activity {
 
             @Override
             public void onClick(View v) {
-                Log.v(TAG, "点击了发送消息");
+                //Log.v(TAG, "点击了发送消息");
                /* Message msg=new Message();
                 msg.what=0x123;
                 Bundle bundle=new Bundle();
                 bundle.putString("inf","主线程发送过来的消息");
                 msg.setData(bundle);
                 rssiThread.rssiHandler.sendMessage(msg);*/
+                rssiThread=new RssiThread(str1);
+                rssiThread2=new RssiThread(str2);
+                rssiThread3=new RssiThread(str3);
+                rssiThread.start();
+                rssiThread2.start();
+                rssiThread3.start();
+
             }
         });
     }
@@ -232,7 +246,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    class ItemClickEvent implements AdapterView.OnItemClickListener {
+    /*class ItemClickEvent implements AdapterView.OnItemClickListener {
 
         @Override
         public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
@@ -256,5 +270,5 @@ public class MainActivity extends Activity {
                     default:break;
             }
         }
-    }
+    }*/
 }
