@@ -18,10 +18,10 @@ public class MainActivity extends Activity {
         public void run() {
             Log.v("MainActivity","读取一次"+mbluetootGatt1.toString()+"的RSSI");
            // while(true){
-            for(int i=0;i<30;i++){
+            for(int i=0;i<300;i++){
                 mbluetootGatt1.readRemoteRssi();
                 try {
-                    Thread.currentThread().sleep(500);
+                    Thread.currentThread().sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -33,10 +33,10 @@ public class MainActivity extends Activity {
         public void run() {
             Log.v("MainActivity","读取一次"+mbluetootGatt2.toString()+"的RSSI");
             // while(true){
-            for(int i=0;i<30;i++){
+            for(int i=0;i<300;i++){
                 mbluetootGatt2.readRemoteRssi();
                 try {
-                    Thread.currentThread().sleep(500);
+                    Thread.currentThread().sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -48,10 +48,10 @@ public class MainActivity extends Activity {
         public void run() {
             Log.v("MainActivity","读取一次"+mbluetootGatt3.toString()+"的RSSI");
             // while(true){
-            for(int i=0;i<30;i++){
+            for(int i=0;i<300;i++){
                 mbluetootGatt3.readRemoteRssi();
                 try {
-                    Thread.currentThread().sleep(500);
+                    Thread.currentThread().sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -66,6 +66,7 @@ public class MainActivity extends Activity {
     Button btrssi2;
     Button btrssi3;
     Button btrssi4;
+    Button connect1,connect2,connect3;
     String str1,str2,str3;
     BluetoothDevice device1;
     BluetoothDevice device2;
@@ -91,26 +92,13 @@ public class MainActivity extends Activity {
         btrssi1=(Button)findViewById(R.id.RSSIbutton1);
         btrssi2=(Button)findViewById(R.id.RSSIbutton2);
         btrssi4=(Button)findViewById(R.id.allRssiThread);
-        str1="78:A5:04:7A:54:FA";
-        str2="20:91:48:32:26:60";
-        str3="20:91:48:32:21:45";
-        device1=bluetoothAdapter.getRemoteDevice(str1);
-        mbluetootGatt1=device1.connectGatt(this, false, gattCallback);
-        try {
-            Thread.currentThread().sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        device2=bluetoothAdapter.getRemoteDevice(str2);
-        mbluetootGatt2=device2.connectGatt(this, false, gattCallback);
-        try {
-            Thread.currentThread().sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        device3=bluetoothAdapter.getRemoteDevice(str3);
-        mbluetootGatt3=device3.connectGatt(this, false, gattCallback);
-        //添加两个按钮的单击事件
+        connect1=(Button)findViewById(R.id.connect1);
+        connect2=(Button)findViewById(R.id.connect2);
+        connect3=(Button)findViewById(R.id.connect3);
+        str1="20:91:48:32:21:45";
+        str2="20:91:48:32:23:30";
+        str3="20:91:48:32:26:09";
+        //添加六个按钮的单击事件
        btrssi1.setOnClickListener(new Button.OnClickListener() {
 
             @Override
@@ -142,6 +130,30 @@ public class MainActivity extends Activity {
                 new RssiThread1().start();
                 new RssiThread2().start();
                 new RssiThread3().start();
+            }
+        });
+        connect1.setOnClickListener(new Button.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                device1 = bluetoothAdapter.getRemoteDevice(str1);
+                mbluetootGatt1=device1.connectGatt(MainActivity.this, true, gattCallback);
+            }
+        });
+        connect2.setOnClickListener(new Button.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                device2 = bluetoothAdapter.getRemoteDevice(str2);
+                mbluetootGatt2=device2.connectGatt(MainActivity.this, true, gattCallback);
+            }
+        });
+        connect3.setOnClickListener(new Button.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                device3 = bluetoothAdapter.getRemoteDevice(str3);
+                mbluetootGatt3=device3.connectGatt(MainActivity.this, true, gattCallback);
             }
         });
     }
@@ -180,7 +192,7 @@ public class MainActivity extends Activity {
         //底层获取RSSI后会回调这个函数
         public void onReadRemoteRssi(BluetoothGatt gatt, int rssi, int status) {
             super.onReadRemoteRssi(gatt, rssi, status);
-            Log.v("MainActivity"+gatt.toString(),""+rssi);
+            Log.v("MainActivity",""+rssi);
     }
     };
 }

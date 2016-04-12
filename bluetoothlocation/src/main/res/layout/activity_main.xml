@@ -31,7 +31,7 @@
         android:id="@+id/RSSIbutton1"
         android:layout_gravity="center_horizontal"
         android:textColor="#ff1919c0"
-        />
+           android:layout_marginTop="@dimen/activity_horizontal_margin"/>
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -39,6 +39,7 @@
         android:id="@+id/RSSIbutton2"
         android:layout_gravity="center_horizontal"
         android:textColor="#ff1919c0"
+        android:layout_marginTop="@dimen/activity_horizontal_margin"
        />
         <Button
             android:layout_width="wrap_content"
@@ -46,13 +47,45 @@
             android:text="线程读取第三个设备的RSSI"
             android:id="@+id/RssiThread"
             android:layout_gravity="center_horizontal"
-             android:textColor="#ff1919c0"/>
+             android:textColor="#ff1919c0"
+            android:layout_marginTop="@dimen/activity_horizontal_margin"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="线程读取全部设备的RSSI"
             android:id="@+id/allRssiThread"
             android:layout_gravity="center_horizontal"
-            android:textColor="#ff1919c0"/>
+            android:textColor="#ff1919c0"
+            android:layout_marginTop="@dimen/activity_horizontal_margin"/>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal">
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="连接1"
+                android:id="@+id/connect1"
+                android:layout_gravity="center_horizontal"
+                android:textColor="#ff1919c0"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="连接2"
+                android:id="@+id/connect2"
+                android:layout_gravity="center_horizontal"
+                android:textColor="#ff1919c0"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="连接3"
+                android:id="@+id/connect3"
+                android:layout_gravity="center_horizontal"
+                android:textColor="#ff1919c0"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"/>
+        </LinearLayout>
     </LinearLayout>
 </RelativeLayout>
