@@ -117,6 +117,9 @@ public class MainActivity extends Activity {
         mBluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
         bleScanFilters = new ArrayList<>();
         bleScanFilters.add(
+                new ScanFilter.Builder().setDeviceAddress("20:91:48:32:23:30").build()
+        );
+       /* bleScanFilters.add(
                 new ScanFilter.Builder().setDeviceAddress("00:15:83:00:3D:13").build()
         );
         bleScanFilters.add(
@@ -124,7 +127,7 @@ public class MainActivity extends Activity {
         );
         bleScanFilters.add(
                 new ScanFilter.Builder().setDeviceAddress("00:15:83:00:3D:B2").build()
-        );
+        );*/
         bleScanSettings =new ScanSettings.Builder().build();
        btrssi1.setOnClickListener(new Button.OnClickListener() {
 
@@ -192,11 +195,11 @@ public class MainActivity extends Activity {
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                bluetoothAdapter.startLeScan(mLeScanCallback);
+               // bluetoothAdapter.startLeScan(mLeScanCallback);
                 // add a filter to only scan for advertisers with the given service UUID
                // Log.d(TAG, "Starting scanning with settings:" + bleScanSettings + " and filters:" + bleScanFilters);
                 // tell the BLE controller to initiate scan
-               // mBluetoothLeScanner.startScan(bleScanFilters, bleScanSettings, mLeScanCallback);
+                mBluetoothLeScanner.startScan(bleScanFilters, bleScanSettings, mLeScanCallback);
             }
         });
         stopsearch.setOnClickListener(new View.OnClickListener() {
@@ -204,8 +207,8 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 if (mBluetoothLeScanner != null) {
                     Log.d(TAG, "Stop scanning.");
-                   // mBluetoothLeScanner.stopScan(mLeScanCallback);
-                    bluetoothAdapter.stopLeScan(mLeScanCallback);
+                    mBluetoothLeScanner.stopScan(mLeScanCallback);
+                    //bluetoothAdapter.stopLeScan(mLeScanCallback);
                 }
 
             }
@@ -256,16 +259,15 @@ public class MainActivity extends Activity {
     }
     };
     //搜索回调函数
-    /*private ScanCallback mLeScanCallback = new ScanCallback() {
+    private ScanCallback mLeScanCallback = new ScanCallback() {
         @Override
-        public void onScanResult (int callbackType, ScanResult result)
-        {
+        public void onScanResult (int callbackType, ScanResult result) {
             BluetoothDevice device = result.getDevice();
-            Log.v(TAG, "Device name: " + device.getName()+"Device address: " + device.getAddress()+"Device service UUIDs: " + device.getUuids());
+            Log.i(TAG, "Device name: " + device.getName()+ " Device address: " + device.getAddress() +" RSSI "+result.getRssi());
         }
-    };*/
+    };
     //另外一个回调函数
-    private BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
+   /* private BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
         @Override
         public void onLeScan(final BluetoothDevice device, final int rssi,final byte[] scanRecord)
         {
@@ -275,5 +277,5 @@ public class MainActivity extends Activity {
                     + ",bondState:" + device.getBondState()
                     + ",rssi:" + rssi);
         }
-    };
+    };*/
 }
