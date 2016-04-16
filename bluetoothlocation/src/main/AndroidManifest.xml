@@ -3,7 +3,7 @@
     package="com.indoorlocate.bluetoothlocation" >
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    <uses-sdk android:minSdkVersion="18"/>
+    <uses-sdk android:minSdkVersion="21"/>
 
     <application
         android:allowBackup="true"
